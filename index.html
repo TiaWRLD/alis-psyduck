@@ -61,9 +61,7 @@ textarea{width:100%;font:inherit;color:inherit;background:var(--bg);border:2px s
 </main>
 
 <script>
-/* Nessun dato personale nel codice.
-   Il topic ntfy arriva dal link che dai a lei: https://tuo-sito/#il-topic-segreto
-   (viene ricordato sul suo telefono dopo la prima apertura). */
+
 let topic = "";
 try {
   const h = decodeURIComponent(location.hash.slice(1)).trim();
@@ -71,7 +69,6 @@ try {
   topic = localStorage.getItem("topic") || "";
 } catch(e) { topic = decodeURIComponent(location.hash.slice(1)).trim(); }
 
-/* id = nome del file in img/ (es. img/felice.png). Se manca, appare l'emoji. */
 const MOODS = [
   {id:"felice",  e:"😄", name:"Psyduck felice",        line:"Oggi sono felice"},
   {id:"stanco",  e:"😴", name:"Psyduck stanco",        line:"Batteria quasi a zero."},
@@ -125,7 +122,7 @@ if (topic){
         headers:{ "Title": "Psyduck di oggi", "Tags": "duck" },
         body: buildMessage()
       });
-      $("status").textContent = r.ok ? "Fatto, lui lo sa. 💛" : "Non è partito, riprova.";
+      $("status").textContent = r.ok ? "Fatto, ho ricevuto una notifica 💛" : "Non è partito, riprova.";
     } catch(e){ $("status").textContent = "Non è partito, riprova."; }
   };
 }
