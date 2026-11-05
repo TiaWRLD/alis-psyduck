@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Che Psyduck sei oggi?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff6d6;--card:#fffdf4;--ink:#3a3320;--soft:#7a6f4d;--accent:#2f8fb8;--accent-ink:#fff;--line:#ecdc9b;--sel:#ffe27a}
+@media (prefers-color-scheme:dark){:root{--bg:#1d2630;--card:#26323f;--ink:#f6efd2;--soft:#b8b394;--accent:#ffd84d;--accent-ink:#2b2610;--line:#3a4a5b;--sel:#4a5b3a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Fredoka',system-ui,sans-serif;min-height:100vh;display:flex;justify-content:center;padding:24px 16px 48px}
+main{width:100%;max-width:520px}
+h1{font-size:2rem;font-weight:600;margin:0 0 4px;line-height:1.15}
+.sub{color:var(--soft);margin:0 0 20px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.mood{font:inherit;color:inherit;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .12s,background .12s}
+.mood:hover{transform:translateY(-2px)}
+.mood:focus-visible,.chip:focus-visible,.send:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.mood[aria-pressed=true]{background:var(--sel);border-color:var(--accent)}
+.mood .e{font-size:1.8rem}
+#result{margin-top:22px;background:var(--card);border:2px solid var(--line);border-radius:22px;padding:18px;text-align:center}
+#result[hidden]{display:none}
+#pic{width:220px;height:220px;max-width:70vw;object-fit:contain;display:block;margin:0 auto}
+#fallback{font-size:6rem;line-height:1.1}
+#title{font-size:1.5rem;font-weight:600;margin:6px 0 2px}
+#line{color:var(--soft);margin:0 0 16px}
+.label{text-align:left;font-weight:500;margin:14px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;color:inherit;background:transparent;border:2px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--sel);border-color:var(--accent)}
+textarea{width:100%;font:inherit;color:inherit;background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:10px;resize:vertical;min-height:64px}
+.send{font:inherit;font-weight:600;width:100%;margin-top:14px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:14px;padding:14px;cursor:pointer;font-size:1.05rem}
+.send.alt{background:transparent;color:var(--ink);border:2px solid var(--line);margin-top:8px;font-weight:500}
+#status{min-height:1.4em;margin:10px 0 0;color:var(--soft)}
+@media (prefers-reduced-motion:reduce){.mood{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Che Psyduck sei oggi?</h1>
+  <p class="sub">Tocca quello che ti somiglia. Niente parole necessarie.</p>
+
+  <div class="grid" id="grid"></div>
+
+  <section id="result" hidden aria-live="polite">
+    <img id="pic" alt="">
+    <div id="fallback" hidden></div>
+    <p id="title"></p>
+    <p id="line"></p>
+
+    <p class="label">Vuoi aggiungere qualcosa? (facoltativo)</p>
+    <textarea id="note" placeholder="Anche una parola sola va bene"></textarea>
+
+    <button class="send" id="sendPush" hidden>Fallo sapere a lui</button>
+    <button class="send alt" id="sendShare" hidden>Condividi</button>
+    <p id="status"></p>
+  </section>
+</main>
+
+<script>
+/* Nessun dato personale nel codice.
+   Il topic ntfy arriva dal link che dai a lei: https://tuo-sito/#il-topic-segreto
+   (viene ricordato sul suo telefono dopo la prima apertura). */
+let topic = "";
+try {
+  const h = decodeURIComponent(location.hash.slice(1)).trim();
+  if (h) { localStorage.setItem("topic", h); history.replaceState(null, "", location.pathname); }
+  topic = localStorage.getItem("topic") || "";
+} catch(e) { topic = decodeURIComponent(location.hash.slice(1)).trim(); }
+
+/* id = nome del file in img/ (es. img/felice.png). Se manca, appare l'emoji. */
+const MOODS = [
+  {id:"felice",  e:"😄", name:"Psyduck felice",        line:"Oggi va bene. Testa leggera."},
+  {id:"stanco",  e:"😴", name:"Psyduck stanco",        line:"Batteria quasi a zero."},
+  {id:"triste",  e:"😢", name:"Psyduck triste",        line:"Oggi pesa un po'."},
+  {id:"mal-di-testa", e:"🤕", name:"Psyduck con il mal di testa", line:"Troppi pensieri, la testa fa male."},
+  {id:"confuso", e:"😵‍💫", name:"Psyduck confuso",       line:"Non so nemmeno io cosa sento."},
+  {id:"nervoso", e:"😠", name:"Psyduck nervoso",       line:"Oggi mi irrito facilmente."},
+  {id:"senza-parole", e:"🫥", name:"Psyduck senza parole", line:"Ho poche parole oggi. Non è colpa tua."}
+];
+
+const $ = id => document.getElementById(id);
+let current = null;
+
+MOODS.forEach(m => {
+  const b = document.createElement("button");
+  b.className = "mood"; b.setAttribute("aria-pressed","false");
+  b.innerHTML = `<span class="e">${m.e}</span><span>${m.name.replace("Psyduck ","")}</span>`;
+  b.onclick = () => pick(m, b);
+  $("grid").appendChild(b);
+});
+
+function pick(m, btn){
+  current = m;
+  document.querySelectorAll(".mood").forEach(x => x.setAttribute("aria-pressed", x === btn));
+  const pic = $("pic"), fb = $("fallback");
+  pic.hidden = false; fb.hidden = true;
+  pic.alt = m.name;
+  pic.onerror = () => { pic.hidden = true; fb.hidden = false; fb.textContent = m.e; };
+  pic.src = `img/${m.id}.png`;
+  $("title").textContent = m.name;
+  $("line").textContent = m.line;
+  $("status").textContent = "";
+  $("result").hidden = false;
+  $("result").scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+
+function buildMessage(){
+  let t = `🦆 Oggi sono ${current.name.toLowerCase()}. ${current.line}`;
+  const note = $("note").value.trim();
+  if (note) t += `\n"${note}"`;
+  return t;
+}
+
+if (topic){
+  $("sendPush").hidden = false;
+  $("sendPush").onclick = async () => {
+    if (!current) return;
+    try {
+      const r = await fetch(`https://ntfy.sh/${encodeURIComponent(topic)}`, {
+        method:"POST",
+        headers:{ "Title": "Psyduck di oggi", "Tags": "duck" },
+        body: buildMessage()
+      });
+      $("status").textContent = r.ok ? "Fatto, lui lo sa. 💛" : "Non è partito, riprova.";
+    } catch(e){ $("status").textContent = "Non è partito, riprova."; }
+  };
+}
+if (navigator.share){
+  $("sendShare").hidden = false;
+  $("sendShare").onclick = () => current && navigator.share({text: buildMessage()}).catch(()=>{});
+}
+</script>
+</body>
+</html>
