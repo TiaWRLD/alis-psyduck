@@ -72,14 +72,14 @@ try {
 
 /* id = nome del file in img/ (es. img/felice.png). Se manca, appare l'emoji. */
 const MOODS = [
-  {id:"felice.jpg",  e:"😄", name:"Psyduck felice",        line:"Oggi sono felice"},
-  {id:"stanco.jpg",  e:"😴", name:"Psyduck stanco",        line:"Batteria quasi a zero."},
-  {id:"triste.jpg",  e:"😢", name:"Psyduck triste",        line:"Oggi pesa un po'."},
-  {id:"malditesta.jpg", e:"🤕", name:"Psyduck con il mal di testa", line:"mal di testaaaa."},
-  {id:"confuso.jpg", e:"😵‍💫", name:"Psyduck confuso",       line:"Non so nemmeno io cosa sento."},
-  {id:"arrabbiato.jpg", e:"😠", name:"Psyduck nervoso",       line:"Oggi mi irrito facilmente."},
-  {id:"ferito.jpg", e:"🫥", name:"Psyduck distrutto", line:"oggi non sono molto in forma"},
-  {id:"infesta.jpg", e:"🥳", name:"Psyduck in festa", line:"Oggi ho voglia di divertirmi"},
+  {id:"felice",  e:"😄", name:"Psyduck felice",        line:"Oggi sono felice"},
+  {id:"stanco",  e:"😴", name:"Psyduck stanco",        line:"Batteria quasi a zero."},
+  {id:"triste",  e:"😢", name:"Psyduck triste",        line:"Oggi pesa un po'."},
+  {id:"malditesta", e:"🤕", name:"Psyduck con il mal di testa", line:"mal di testaaaa."},
+  {id:"confuso", e:"😵‍💫", name:"Psyduck confuso",       line:"Non so nemmeno io cosa sento."},
+  {id:"arrabbiato", e:"😠", name:"Psyduck nervoso",       line:"Oggi mi irrito facilmente."},
+  {id:"ferito", e:"🫥", name:"Psyduck distrutto", line:"oggi non sono molto in forma"},
+  {id:"infesta", e:"🥳", name:"Psyduck in festa", line:"Oggi ho voglia di divertirmi"},
 
 ];
 
@@ -101,7 +101,7 @@ function pick(m, btn){
   pic.hidden = false; fb.hidden = true;
   pic.alt = m.name;
   pic.onerror = () => { pic.hidden = true; fb.hidden = false; fb.textContent = m.e; };
-  pic.src = `images/${m.id}.png`;
+  pic.src = `images/${m.id}.jpg`;
   $("title").textContent = m.name;
   $("line").textContent = m.line;
   $("status").textContent = "";
