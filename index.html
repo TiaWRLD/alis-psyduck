@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Che Psyduck sei oggi? (Non sono molto forte in chat quindi ho deciso di fare per te qualcosa di carino)</title>
+<title>Che Psyduck sei oggi? </title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -20,6 +20,7 @@ h1{font-size:2rem;font-weight:600;margin:0 0 4px;line-height:1.15}
 .mood:focus-visible,.chip:focus-visible,.send:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .mood[aria-pressed=true]{background:var(--sel);border-color:var(--accent)}
 .mood .e{font-size:1.8rem}
+.thumb{width:72px;height:72px;object-fit:contain}
 #result{margin-top:22px;background:var(--card);border:2px solid var(--line);border-radius:22px;padding:18px;text-align:center}
 #result[hidden]{display:none}
 #pic{width:220px;height:220px;max-width:70vw;object-fit:contain;display:block;margin:0 auto}
@@ -39,8 +40,8 @@ textarea{width:100%;font:inherit;color:inherit;background:var(--bg);border:2px s
 </head>
 <body>
 <main>
-  <h1>Che Psyduck sei oggi?</h1>
-  <p class="sub">Tocca quello che ti somiglia. Niente parole necessarie.</p>
+  <h1>Che Psyduck sei oggi? (Non sono molto forte in chat quindi ho deciso di fare per te qualcosa di carino)</h1>
+  <p class="sub">Tocca quello che ti descrive meglio</p>
 
   <div class="grid" id="grid"></div>
 
@@ -50,10 +51,10 @@ textarea{width:100%;font:inherit;color:inherit;background:var(--bg);border:2px s
     <p id="title"></p>
     <p id="line"></p>
 
-    <p class="label">Vuoi aggiungere qualcosa? (facoltativo)</p>
+    <p class="label">Vuoi aggiungere qualcosa?</p>
     <textarea id="note" placeholder="Anche una parola sola va bene"></textarea>
 
-    <button class="send" id="sendPush" hidden>Fallo sapere a lui</button>
+    <button class="send" id="sendPush" hidden>Fammelo sapere</button>
     <button class="send alt" id="sendShare" hidden>Condividi</button>
     <p id="status"></p>
   </section>
@@ -89,8 +90,7 @@ let current = null;
 MOODS.forEach(m => {
   const b = document.createElement("button");
   b.className = "mood"; b.setAttribute("aria-pressed","false");
-  b.innerHTML = `<span class="e">${m.e}</span><span>${m.name.replace("Psyduck ","")}</span>`;
-  b.onclick = () => pick(m, b);
+  b.innerHTML = `<img class="thumb" src="${imgSrc(m)}" alt="" onerror="this.outerHTML='<span class=e>${m.e}</span>'"><span>${m.name.replace("Psyduck ","")}</span>`;  b.onclick = () => pick(m, b);
   $("grid").appendChild(b);
 });
 
