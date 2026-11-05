@@ -83,7 +83,7 @@ const MOODS = [
   {id:"infesta", e:"🥳", name:"Psyduck in festa", line:"Oggi ho voglia di divertirmi"},
 
 ];
-
+function imgSrc(m){ return `images/${m.id}.jpg`; }
 const $ = id => document.getElementById(id);
 let current = null;
 
@@ -101,8 +101,7 @@ function pick(m, btn){
   pic.hidden = false; fb.hidden = true;
   pic.alt = m.name;
   pic.onerror = () => { pic.hidden = true; fb.hidden = false; fb.textContent = m.e; };
-  pic.src = `images/${m.id}.jpg`;
-  $("title").textContent = m.name;
+  pic.src = imgSrc(m);  $("title").textContent = m.name;
   $("line").textContent = m.line;
   $("status").textContent = "";
   $("result").hidden = false;
